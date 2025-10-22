@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 
 import { Collapsible } from '@/components/ui/collapsible';
 import { ExternalLink } from '@/components/external-link';
@@ -8,8 +8,20 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
+import { useAuth } from '@/contexts/AuthContext';
+import { signOut } from '@/lib/auth';
 
 export default function TabTwoScreen() {
+  const { user } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to sign out');
+    }
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -29,6 +41,12 @@ export default function TabTwoScreen() {
           }}>
           Explore
         </ThemedText>
+      </ThemedView>
+      <ThemedView style={styles.userInfo}>
+        <ThemedText>Logged in as: {user?.email}</ThemedText>
+        <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+          <ThemedText style={styles.signOutText}>Sign Out</ThemedText>
+        </TouchableOpacity>
       </ThemedView>
       <ThemedText>This app includes example code to help you get started.</ThemedText>
       <Collapsible title="File-based routing">
@@ -108,5 +126,21 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+  },
+  userInfo: {
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 8,
+    gap: 12,
+  },
+  signOutButton: {
+    backgroundColor: '#FF3B30',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  signOutText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });
